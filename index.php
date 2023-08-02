@@ -484,8 +484,6 @@ if (preg_match('/product_(\w+)/', $datain, $dataget)) {
         sendmessage($from_id, $textbotlang['users']['stateus']['error'], $keyboard, 'html');
         return;
     }
-    #-------------username----------------#
-    $usernames = $data_useer['username'];
     #-------------status----------------#
     $status = $data_useer['status'];
     $status_var = [
@@ -495,7 +493,7 @@ if (preg_match('/product_(\w+)/', $datain, $dataget)) {
         'expired' => $textbotlang['users']['stateus']['expired']
     ][$status];
     #--------------[ expire ]---------------#
-    $expirationDate = $data_useer['expire'] ? jdate('Y/m/d', $data_useer['expire']) : $textbotlang['users']['stateus']['Unlimited'];
+        $expirationDate = $data_useer['expire'] ? jdate('Y/m/d', $data_useer['expire']) : $textbotlang['users']['stateus']['Unlimited'];
     #-------------[ data_limit ]----------------#
     $LastTraffic = $data_useer['data_limit'] ? formatBytes($data_useer['data_limit']) : $textbotlang['users']['stateus']['Unlimited'];
     #---------------[ RemainingVolume ]--------------#
@@ -507,43 +505,7 @@ if (preg_match('/product_(\w+)/', $datain, $dataget)) {
     $timeDiff = $data_useer['expire'] - time();
     $day = $data_useer['expire'] ? floor($timeDiff / 86400) + 1 . $textbotlang['users']['stateus']['day'] : $textbotlang['users']['stateus']['Unlimited'];
     #-----------------------------#
-    $keyboardinfo = json_encode([
-        'inline_keyboard' => [
-            [
-                ['text' => $data_useer['username'], 'callback_data' => "username"],
-                ['text' => $textbotlang['users']['stateus']['username'], 'callback_data' => 'username'],
-            ], [
-                ['text' => $status_var, 'callback_data' => 'status_var'],
-                ['text' => $textbotlang['users']['stateus']['stateus'], 'callback_data' => 'status_var'],
-            ], [
-                ['text' => $expirationDate, 'callback_data' => 'expirationDate'],
-                ['text' => $textbotlang['users']['stateus']['expirationDate'], 'callback_data' => 'expirationDate'],
-            ], [], [
-                ['text' => $day, 'callback_data' => 'روز'],
-                ['text' => $textbotlang['users']['stateus']['daysleft'], 'callback_data' => 'day'],
-            ], [
-                ['text' => $LastTraffic, 'callback_data' => 'LastTraffic'],
-                ['text' => $textbotlang['users']['stateus']['LastTraffic'], 'callback_data' => 'LastTraffic'],
-            ], [
-                ['text' => $usedTrafficGb, 'callback_data' => 'expirationDate'],
-                ['text' => $textbotlang['users']['stateus']['usedTrafficGb'], 'callback_data' => 'expirationDate'],
-            ], [
-                ['text' => $RemainingVolume, 'callback_data' => 'RemainingVolume'],
-                ['text' => $textbotlang['users']['stateus']['RemainingVolume'], 'callback_data' => 'RemainingVolume'],
-            ],
-            [
-                ['text' => $textbotlang['users']['stateus']['manageService'], 'callback_data' => 'settings_' . $usernames],
-            ],
-            [
-                ['text' => $textbotlang['users']['stateus']['backlist'], 'callback_data' => 'backorder'],
-            ]
-        ]
-    ]);
-    Editmessagetext($from_id, $message_id, $textbotlang['users']['stateus']['info'], $keyboardinfo);
-}
-if (preg_match('/settings_(\w+)/', $datain, $dataget)) {
-        $username = $dataget[1];
-        $keyboardsetting = json_encode([
+    $keyboardsetting = json_encode([
         'inline_keyboard' => [
             [
                 ['text' => $textbotlang['users']['stateus']['linksub'], 'callback_data' => 'subscriptionurl_'.$username],
@@ -557,13 +519,24 @@ if (preg_match('/settings_(\w+)/', $datain, $dataget)) {
                 ['text' => $textbotlang['users']['Extra_volume']['sellextra'], 'callback_data' => 'Extra_volume_'.$username],
                 ],
             [
-                ['text' => $textbotlang['users']['stateus']['backservice'], 'callback_data' => "product_" . $username],
+                ['text' => $textbotlang['users']['stateus']['backlist'], 'callback_data' => 'backorder'],
             ]
         ]
     ]);
-    Editmessagetext($from_id, $message_id, $textbotlang['users']['stateus']['DecManageService '], $keyboardsetting);
- }
-elseif (preg_match('/subscriptionurl_(\w+)/', $datain, $dataget)) {
+    $textinfo = "وضعیت سرویس : $status_var
+نام کاربری سرویس : {$data_useer['username']}
+لوکیشن :{$nameloc['Service_location']}
+کد سرویس:{$nameloc['id_invoice']}
+
+📥 حجم مصرفی : $usedTrafficGb
+♾ حجم سرویس : $LastTraffic
+
+📅 فعال تا تاریخ : $expirationDate ($day)
+
+🚫 برای تغییر لینک و قطع دسترسی دیگران کافیست روی گزینه ' بروزرسانی اشتراک ' کلیک کنید.";
+    Editmessagetext($from_id, $message_id, $textinfo, $keyboardsetting);
+}
+if (preg_match('/subscriptionurl_(\w+)/', $datain, $dataget)) {
     $username = $dataget[1];
     $nameloc = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM invoice WHERE username = '$username'"));
     $marzban_list_get = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM marzban_panel WHERE name_panel = '{$nameloc['Service_location']}'"));
@@ -746,6 +719,10 @@ elseif($user['step'] == "getvolumeextra"){
         sendmessage($from_id, $textbotlang['Admin']['Product']['Invalidvolume'], $backuser, 'HTML');
         return;
     }
+    if($text<1){
+        sendmessage($from_id, $textbotlang['users']['Extra_volume']['invalidprice'], $backuser, 'HTML');
+        return;
+    }
     $priceextra = $setting['Extra_volume']*$text;
     $textextra = "📇 فاکتور خرید حجم اضافه برای شما ایجاد شد.
 
@@ -782,6 +759,7 @@ elseif (preg_match('/confirmaextra_(\w+)/', $datain, $dataget)) {
     $stmt->execute();
         return;
         }
+    deletemessage($from_id, $message_id);
     $Balance_Low_user = $user['Balance'] - $volume;
     $stmt = $connect->prepare("UPDATE user SET Balance = ? WHERE id = ?");
     $stmt->bind_param("ss", $Balance_Low_user, $from_id);
@@ -796,9 +774,6 @@ elseif (preg_match('/confirmaextra_(\w+)/', $datain, $dataget)) {
      Modifyuser($Check_token['access_token'],$marzban_list_get['url_panel'],$Processing_value,$datam);
             $keyboardextrafnished = json_encode([
         'inline_keyboard' => [
-            [
-                ['text' => $textbotlang['users']['stateus']['backlist'], 'callback_data' => "backorder"],
-            ],
             [
                 ['text' => $textbotlang['users']['stateus']['backservice'], 'callback_data' => "product_" . $Processing_value],
 ]
@@ -2533,12 +2508,28 @@ if (preg_match('/Response_(\w+)/', $datain, $dataget)) {
     sendmessage($from_id, $textbotlang['Admin']['ManageUser']['GetTextResponse'], $backadin, 'HTML');
 } elseif ($user['step'] == "getmessageAsAdmin") {
     sendmessage($from_id, $textbotlang['Admin']['ManageUser']['SendMessageuser'], null, 'HTML');
-    $textSendAdminToUser = "
+    if($text){
+        $textSendAdminToUser = "
                 📩 یک پیام از سمت مدیریت برای شما ارسال گردید.
             
     متن پیام : 
     $text";
     sendmessage($Processing_value, $textSendAdminToUser, null, 'HTML');
+    }
+    if($photo){
+        $textSendAdminToUser = "
+                📩 یک پیام از سمت مدیریت برای شما ارسال گردید.
+            
+    متن پیام : 
+    $caption";
+        telegram('sendphoto', [
+            'chat_id' => $Processing_value,
+            'photo' => $photoid,
+            'reply_markup' => $Response,
+            'caption' => $textSendAdminToUser,
+            'parse_mode' => "HTML",
+        ]);
+    }
     $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
     $step = 'home';
     $stmt->bind_param("ss", $step, $from_id);
@@ -3628,10 +3619,32 @@ if ($text == "💡 روش ساخت نام کاربری") {
     $stmt->bind_param("s", $text);
     $stmt->execute();
     sendmessage($from_id, $textbotlang['Admin']['AlgortimeUsername']['SaveData'], $keyboardmarzban, 'HTML');
+    if($text == "متن دلخواه + عدد رندوم"){
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'getnamecustom';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+    sendmessage($from_id, $textbotlang['Admin']['managepanel']['customnamesend'], $backuser, 'HTML');
+    return;
+    }
     $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
     $step = 'home';
     $stmt->bind_param("ss", $step, $from_id);
     $stmt->execute();
+}
+elseif($user['step'] == "getnamecustom"){
+        if (!preg_match('/^\w{3,32}$/', $text)) {
+        sendmessage($from_id, $textbotlang['Admin']['managepanel']['invalidname'], $backadmin, 'html');
+        return;
+    }
+    $stmt = $connect->prepare("UPDATE setting SET namecustom = ?");
+    $stmt->bind_param("s", $text);
+    $stmt->execute();
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'home';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+    sendmessage($from_id, $textbotlang['Admin']['managepanel']['savedname'], $keyboardmarzban, 'HTML');
 }
 #----------------[  MANAGE PAYMENT   ]------------------#
 
