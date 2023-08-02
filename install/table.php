@@ -133,6 +133,7 @@ try {
         val_usertest varchar(600)  NULL,
         flow varchar(600)  NULL,
         Extra_volume varchar(600)  NULL,
+        namecustom varchar(600)  NULL,
         MethodUsername varchar(900)  NULL)
         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin");
         if (!$result) {
@@ -147,12 +148,17 @@ try {
         $configManual = "❌ ارسال کانفیگ دستی خاموش است";
         $configManual = "❌ ارسال کانفیگ دستی خاموش است";
         $MethodUsername ="آیدی عددی + حروف و عدد رندوم";
-$connect->query("INSERT INTO setting (Bot_Status,roll_Status,get_number,limit_usertest_all,time_usertest,val_usertest,help_Status,iran_number,sublink,configManual,NotUser,two_columns,MethodUsername,flow) VALUES ('$active_bot_text','$active_roll_text','$active_phone_text','1','1','100','$active_help','$active_phone_iran_text','$sublink','$configManual','offnotuser','off','$MethodUsername','offflow')");
+$connect->query("INSERT INTO setting (Bot_Status,roll_Status,get_number,limit_usertest_all,time_usertest,val_usertest,help_Status,iran_number,sublink,configManual,NotUser,two_columns,MethodUsername,flow,namecustom) VALUES ('$active_bot_text','$active_roll_text','$active_phone_text','1','1','100','$active_help','$active_phone_iran_text','$sublink','$configManual','offnotuser','off','$MethodUsername','offflow','null')");
     } else {
         $Check_filde = $connect->query("SHOW COLUMNS FROM setting LIKE 'configManual'");
         if (mysqli_num_rows($Check_filde) != 1) {
             $connect->query("ALTER TABLE setting ADD configManual VARCHAR(200)");
             echo "The configManual field was added ✅";
+        }
+        $Check_filde = $connect->query("SHOW COLUMNS FROM setting LIKE 'namecustom'");
+        if (mysqli_num_rows($Check_filde) != 1) {
+            $connect->query("ALTER TABLE setting ADD namecustom VARCHAR(200)");
+            echo "The namecustom field was added ✅";
         }
         $Check_filde = $connect->query("SHOW COLUMNS FROM setting LIKE 'Extra_volume'");
         if (mysqli_num_rows($Check_filde) != 1) {
