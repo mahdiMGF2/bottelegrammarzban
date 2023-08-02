@@ -78,6 +78,7 @@ $textbotlang['users']['Extra_volume']['ChangedPrice'] = "✅ مبلغ با مو�
 $textbotlang['users']['Extra_volume']['sellextra'] = "➕ خرید حجم اضافه";
 $textbotlang['users']['Extra_volume']['extraadded'] = "✅ حجم با موفقیت به سرویس شما اضافه گردید.";
 $textbotlang['users']['Extra_volume']['extracheck'] = "تایید و دریافت حجم اضافه";
+$textbotlang['users']['Extra_volume']['invalidprice'] = "حداقل حجم 1 گیگابایت می باشد";
 
 $textbotlang['users']['usertest']['limitwarning'] = "⚠️ محدودیت ساخت اشتراک تست شما به پایان رسید.";
 $textbotlang['users']['usertest']['errorcreat'] = "❌ خطایی در ساخت اشتراک رخ داده است برای رفع مشکل با پشتیبانی در ارتباط باشد.";
@@ -224,6 +225,9 @@ $textbotlang['Admin']['managepanel']['getloc'] = "برای ویرایش پنل �
 $textbotlang['Admin']['managepanel']['GetNameNew'] = "نام جدید پنل را  ارسال کنید";
 $textbotlang['Admin']['managepanel']['ChangedNmaePanel'] = "✅ نام پنل با موفقیت تغییر کرد.";
 $textbotlang['Admin']['managepanel']['Repeatpanel'] = "❌ نام پنل از قبل ثبت شده دوباره نمی توانید ثبت کنید";
+$textbotlang['Admin']['managepanel']['customnamesend'] = "متن دلخواه خود را ارسال کنید";
+$textbotlang['Admin']['managepanel']['invalidname'] = "نام نامعتبر است";
+$textbotlang['Admin']['managepanel']['savedname'] = "✅ نام  با موفقیت ذخیره شد";
 
 
 
