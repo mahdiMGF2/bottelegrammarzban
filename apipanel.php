@@ -171,6 +171,8 @@ function formatBytes($bytes, $precision = 2): string
 function generateUsername($from_id,$Metode,$username,$randomString,$text)
 {
     global $connect;
+    $setting = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM setting"));
+    global $connect;
     if($Metode == "آیدی عددی + حروف و عدد رندوم"){
         return $from_id."_".$randomString;
     }
@@ -183,4 +185,7 @@ function generateUsername($from_id,$Metode,$username,$randomString,$text)
         return $username."_".$countInvoice;
     }
     elseif($Metode == "نام کاربری دلخواه")return $text;
+    elseif($Metode == "متن دلخواه + عدد رندوم"){
+        return $setting['namecustom']."_".$randomString;
+    }
 }
