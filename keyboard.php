@@ -79,6 +79,7 @@ $keyboardpaymentManage = json_encode([
         [['text' => "💳 تنظبمات درگاه آفلاین"]],
         [['text' => "💵 تنظیمات nowpayment"]],
         [['text' => "💎 درگاه ارزی ریالی"],['text' => "🟡  درگاه زرین پال"]],
+        [['text' => "🔵 درگاه آقای پرداخت"]],
         [['text' => "🏠 بازگشت به منوی مدیریت"]]
     ],
     'resize_keyboard' => true
@@ -94,6 +95,13 @@ $CartManage = json_encode([
 $zarinpal = json_encode([
     'keyboard' => [
         [['text' => "تنظیم مرچنت"],['text' => "وضعیت درگاه زرین پال"]],
+        [['text' => "🏠 بازگشت به منوی مدیریت"]]
+    ],
+    'resize_keyboard' => true
+]);
+$aqayepardakht = json_encode([
+    'keyboard' => [
+        [['text' => "تنظیم مرچنت آقای پرداخت"],['text' => "وضعیت درگاه آقای پرداخت "]],
         [['text' => "🏠 بازگشت به منوی مدیریت"]]
     ],
     'resize_keyboard' => true
@@ -147,6 +155,7 @@ $PaySettingcard = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) F
 $PaySettingnow = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'nowpaymentstatus'"))['ValuePay'];
 $PaySettingdigi = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'digistatus'"))['ValuePay'];
 $PaySettingzarin = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'statuszarinpal'"))['ValuePay'];
+$PaySettingaqayepardakht = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'statusaqayepardakht'"))['ValuePay'];
 $step_payment = [
     'inline_keyboard' => []
     ];
@@ -170,6 +179,11 @@ $step_payment = [
             ['text' => "🟡 درگاه زرین پال" , 'callback_data' => "zarinpal" ]
     ];
     }
+   if($PaySettingaqayepardakht == "onaqayepardakht"){
+        $step_payment['inline_keyboard'][] = [
+            ['text' => "🔵 درگاه آقای پرداخت" , 'callback_data' => "aqayepardakht" ]
+    ];
+    }
     $step_payment['inline_keyboard'][] = [
             ['text' => "❌ بستن لیست" , 'callback_data' => "colselist" ]
     ];
@@ -179,6 +193,7 @@ $User_Services = json_encode([
         [['text' => "📱 احراز هویت شماره"], ['text' => "📨 ارسال پیام به کاربر"]],
         [['text' => "🔒 مسدود کردن کاربر"], ['text' => "🔓 رفع مسدودی کاربر"]],
         [['text' => "⬆️️️ افزایش موجودی کاربر"], ['text' => "⬇️ کم کردن موجودی"]],
+        [['text' => "🤖 افزودن نماینده"],['text' => "🤖 حذف نماینده"]],
         [['text' => "👁‍🗨 مشاهده اطلاعات کاربر"], ['text' => "🛍 مشاهده سفارشات کاربر"]],
         [['text' => "❌ حذف سرویس کاربر"]],
         [['text' => "🏠 بازگشت به منوی مدیریت"]]
@@ -353,8 +368,12 @@ $textbot = json_encode([
 $result = $connect->query("SHOW TABLES LIKE 'product'");
 $table_exists = ($result->num_rows > 0);
 if ($table_exists) {
-        $getdataproduct = mysqli_query($connect, "SELECT * FROM product WHERE Location = '$text' OR Location = '/all' ");
-        if($setting['two_columns'] =="on"){
+    $users = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM user WHERE id = '$from_id'"));
+    if($users['agent'] == "n"){
+        $getdataproduct = mysqli_query($connect, "SELECT * FROM product WHERE (Location = '$text' OR Location = '/all') AND agent= 'n' ");
+    }else{
+        $getdataproduct = mysqli_query($connect, "SELECT * FROM product WHERE (Location = '$text' OR Location = '/all')AND agent= 'f' ");
+    }        if($setting['two_columns'] =="on"){
         while ($result = mysqli_fetch_assoc($getdataproduct)) {
     $product[] = ['text'=>$result['name_product']];
     }

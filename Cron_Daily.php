@@ -32,8 +32,11 @@ sendmessage($row['id_user'], $text, null,'HTML');
 ";
 sendmessage($row['id_user'], $text, null,'HTML');
     }
-    if($day == "-3"){
-                removeuser($Check_token['access_token'], $marzban_list_get['url_panel'], $row['username']);
+if($day == "-3"){
+    removeuser($Check_token['access_token'], $marzban_list_get['url_panel'], $row['username']);
+    $stmt = $connect->prepare("DELETE FROM invoice WHERE username = ? ");
+    $stmt->bind_param("s", $row['username']);
+    $stmt->execute();
     }
     }
 }

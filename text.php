@@ -147,7 +147,6 @@ $textbotlang['users']['Service']['Location'] = "🌏 موقعیت سرویس خ�
 $textbotlang['users']['config'] = " کانفیگ های شما:";
 $textbotlang['users']['Invalid-comment'] = "❌ دستور نامعتبر است ❌";
 $textbotlang['users']['selectusername'] = "نام کاربری خود را ارسال نمایید
-
 ⚠️ نام کاربری باید بدون کاراکترهای اضافه مانند @ ، فاصله ، خط تیره باشد. 
 ⚠️ نام کاربری باید انگلیسی باشد";
 $textbotlang['users']['invalidusername'] ="❌نام کاربری نامعتبر است
@@ -325,6 +324,9 @@ $textbotlang['Admin']['Status']['digiStatuson'] = "درگاه  روشن گردی
 $textbotlang['Admin']['Status']['zarinpalTitle'] = "در این بخش می توانید درگاه زرین پال را فعال یا غیرفعال کنید";
 $textbotlang['Admin']['Status']['zarrinpalStatusOff'] = "⭕ درگاه  خاموش گردید";
 $textbotlang['Admin']['Status']['zarinpalStatuson'] = "درگاه  روشن گردید";
+$textbotlang['Admin']['Status']['aqayepardakhtTitle'] = "در این بخش می توانید درگاه آقای پرداخت  را فعال یا غیرفعال کنید";
+$textbotlang['Admin']['Status']['aqayepardakhtStatusOff'] = "⭕ درگاه  خاموش گردید";
+$textbotlang['Admin']['Status']['aqayepardakhtStatuson'] = "درگاه  روشن گردید";
 
 
 
@@ -423,3 +425,11 @@ $textbotlang['Admin']['AlgortimeUsername']['SaveData'] = "✅روش ساخت ن�
 
 $textbotlang['Admin']['SettingPayment']['Savacard'] = "✅ شماره کارت شما با موفقیت ثبت شد.";
 $textbotlang['Admin']['SettingnowPayment']['Savaapi'] = "✅ تغییرات  با موفقیت ثبت شد";
+
+$textbotlang['Admin']['agent']['agentsendid'] = " ⭕️ برای اضافه کردن نماینده آیدی عددی کاربر را ارسال نمایید.";
+$textbotlang['Admin']['agent']['agentsendidremove'] = "⭕️ برای حذف کردن نماینده آیدی عددی کاربر را ارسال نمایید";
+$textbotlang['Admin']['agent']['useragented'] = "✅کاربر با موفقیت نماینده شد";
+$textbotlang['Admin']['agent']['useragentremoved'] = "❌ کاربر با موفقیت از حالت نماینده حذف شد";
+$textbotlang['Admin']['agent']['invalidvlue'] = "⭕️ ورودی نا معتبر";
+$textbotlang['Admin']['agent']['setagentproduct'] = "محصول برای چه کاربری نشان داده شود ؟
+کاربر نماینده کلمه n را ارسال کنید کاربر عادی کلمه f";

@@ -1219,8 +1219,9 @@ elseif ($user['step'] == "payment" && $text == "💰 پرداخت و دریاف�
     if (isset($get_username_Check['username']) || in_array($username_ac, $usernameinvoice)) {
         $username_ac = $random_number . $username_ac;
     }
-    $stmt = $connect->prepare("INSERT IGNORE INTO invoice (id_user, id_invoice, username,time_sell, Service_location, name_product, price_product, Volume, Service_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)");
-    $stmt->bind_param("sssssssss", $from_id, $randomString, $username_ac, $date, $Processing_value, $info_product['name_product'], $info_product['price_product'], $info_product['Volume_constraint'], $info_product['Service_time']);
+    $stmt = $connect->prepare("INSERT IGNORE INTO invoice (id_user, id_invoice, username,time_sell, Service_location, name_product, price_product, Volume, Service_time,Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)");
+    $Status =  "active";
+    $stmt->bind_param("ssssssssss", $from_id, $randomString, $username_ac, $date, $Processing_value, $info_product['name_product'], $info_product['price_product'], $info_product['Volume_constraint'], $info_product['Service_time'],$Status);
     $stmt->execute();
     $stmt->close();
     $date = strtotime("+" . $info_product['Service_time'] . "days");
@@ -1428,6 +1429,37 @@ $PaySetting
 جهت پرداخت از دکمه زیر استفاده کنید👇🏻";
         sendmessage($from_id, $textnowpayments, $paymentkeyboard, 'HTML');
     }
+    if ($datain == "aqayepardakht") {
+        if ($Processing_value < 5000) {
+            sendmessage($from_id, $textbotlang['users']['Balance']['zarinpal'], null, 'HTML');
+            return;
+        }
+        sendmessage($from_id, $textbotlang['users']['Balance']['linkpayments'], $keyboard, 'HTML');
+        $dateacc = date('Y/m/d h:i:s');
+        $randomString = bin2hex(random_bytes(5));
+        $stmt = $connect->prepare("INSERT INTO Payment_report (id_user,id_order,time,price,payment_Status,Payment_Method) VALUES (?,?,?,?,?,?)");
+        $payment_Status = "Unpaid";
+        $Payment_Method = "aqayepardakht";
+        $stmt->bind_param("ssssss", $from_id, $randomString, $dateacc, $Processing_value, $payment_Status,$Payment_Method);
+        $stmt->execute();
+        $paymentkeyboard = json_encode([
+            'inline_keyboard' => [
+                [
+                    ['text' => $textbotlang['users']['Balance']['payments'], 'url' => "https://" . "$domainhosts" . "/payment/aqayepardakht/aqayepardakht.php?price=$Processing_value&order_id=$randomString"],
+                ]
+            ]
+        ]);
+        $Processing_value = number_format($Processing_value, 0);
+        $textnowpayments = "
+        ✅ فاکتور پرداخت ایجاد شد.
+    
+🔢 شماره فاکتور : $randomString
+💰 مبلغ فاکتور : $Processing_value تومان
+
+جهت پرداخت از دکمه زیر استفاده کنید👇🏻";
+        sendmessage($from_id, $textnowpayments, $paymentkeyboard, 'HTML');
+    }
+
     if ($datain == "nowpayments") {
         $price_rate = tronchangeto();
         $USD = $price_rate['result']['USD'];
@@ -1707,6 +1739,7 @@ if ($text == $datatextbot['text_Tariff_list']) {
 }
 if($datain == "colselist"){
     deletemessage($from_id, $message_id);
+    sendmessage($from_id, $textbotlang['users']['back'], $keyboard, 'HTML');
 }
 #----------------[  admin section  ]------------------#
 $textadmin = ["panel", "/panel", "پنل مدیریت", "ادمین"];
@@ -2863,7 +2896,8 @@ if ($text == "📣 تنظیم کانال گزارش") {
 #-------------------------#
 if ($text == "🏬 بخش فروشگاه") {
     sendmessage($from_id, $textbotlang['users']['selectoption'], $shopkeyboard, 'HTML');
-} elseif ($text == "🛍 اضافه کردن محصول") {
+} 
+elseif ($text == "🛍 اضافه کردن محصول") {
         $locationproduct = mysqli_query($connect, "SELECT * FROM marzban_panel");
     if (mysqli_num_rows($locationproduct) == 0) {
     sendmessage($from_id, $textbotlang['Admin']['managepanel']['nullpaneladmin'], null, 'HTML');
@@ -2882,12 +2916,27 @@ if ($text == "🏬 بخش فروشگاه") {
     $stmt = $connect->prepare("UPDATE user SET Processing_value = ? WHERE id = ?");
     $stmt->bind_param("ss", $randomString, $from_id);
     $stmt->execute();
+    sendmessage($from_id,$textbotlang['Admin']['agent']['setagentproduct'], $backadmin, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'get_agent';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+elseif ($user['step'] == "get_agent") {
+    $agent = ["n","f"];
+    if(!in_array($text,$agent)){
+                sendmessage($from_id,$textbotlang['Admin']['agent']['invalidvlue'], $backadmin, 'HTML');
+                return;
+    }
+    $stmt = $connect->prepare("UPDATE product SET agent = ? WHERE code_product = ?");
+    $stmt->bind_param("ss", $text, $Processing_value);
+    $stmt->execute();
     sendmessage($from_id,$textbotlang['Admin']['Product']['Service_location'], $json_list_marzban_panel, 'HTML');
     $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
     $step = 'get_location';
     $stmt->bind_param("ss", $step, $from_id);
     $stmt->execute();
-} elseif ($user['step'] == "get_location") {
+}elseif ($user['step'] == "get_location") {
     $stmt = $connect->prepare("UPDATE product SET Location = ? WHERE code_product = ?");
     $stmt->bind_param("ss", $text, $Processing_value);
     $stmt->execute();
@@ -3830,6 +3879,58 @@ if ($datain == "offzarinpal"){
     $stmt->execute();
     Editmessagetext($from_id, $message_id, $textbotlang['Admin']['Status']['zarrinpalStatusOff'], null);
 }
+if($text == "🟡 درگاه آقای پرداخت"){
+    sendmessage($from_id, $textbotlang['users']['selectoption'], $aqayepardakht, 'HTML');
+}
+if($text == "تنظیم مرچنت آقای پرداخت"){
+    $PaySetting = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'merchant_id_aqayepardakht'"));
+    $textaqayepardakht = "💳 مرچنت کد خود را ازآقای پرداخت دریافت و در این قسمت وارد کنید
+
+مرچنت کد فعلی شما : {$PaySetting['ValuePay']}";
+    sendmessage($from_id, $textaqayepardakht, $backadmin, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'merchant_id_aqayepardakht';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+elseif($user['step'] == "merchant_id_aqayepardakht"){
+    sendmessage($from_id,$textbotlang['Admin']['SettingnowPayment']['Savaapi'] , $aqayepardakht,'HTML');
+    $stmt = $connect->prepare("UPDATE PaySetting SET ValuePay = ? WHERE NamePay = ?");
+    $namepay = "merchant_id_aqayepardakht";
+    $stmt->bind_param("ss", $text, $namepay);
+    $stmt->execute();
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'home';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+
+if ($text == "وضعیت درگاه آقای پرداخت") {
+        $PaySetting = mysqli_fetch_assoc(mysqli_query($connect, "SELECT (ValuePay) FROM PaySetting WHERE NamePay = 'statusaqayepardakht'"))['ValuePay'];
+    $aqayepardakht_Status = json_encode([
+    'inline_keyboard' => [
+        [
+            ['text' => $PaySetting, 'callback_data' => $PaySetting],
+        ],
+    ]
+]);
+    sendmessage($from_id, $textbotlang['Admin']['Status']['aqayepardakhtTitle'], $aqayepardakht_Status, 'HTML');
+}
+if ($datain == "offaqayepardakht"){
+    $stmt = $connect->prepare("UPDATE PaySetting SET ValuePay = ? WHERE NamePay = ?");
+    $Status = 'onaqayepardakht';
+    $where = 'statusaqayepardakht';
+    $stmt->bind_param("ss", $Status,$where);
+    $stmt->execute();
+    Editmessagetext($from_id, $message_id,$textbotlang['Admin']['Status']['aqayepardakhtStatuson'], null);
+} elseif ($datain == "onaqayepardakht") {
+    $stmt = $connect->prepare("UPDATE PaySetting SET ValuePay = ? WHERE NamePay = ?");
+    $Status = 'offaqayepardakht';
+    $where = 'statusaqayepardakht';
+    $stmt->bind_param("ss", $Status,$where);
+    $stmt->execute();
+    Editmessagetext($from_id, $message_id, $textbotlang['Admin']['Status']['aqayepardakhtStatusOff'], null);
+}
 if($text == "✏️ ویرایش پنل"){
     sendmessage($from_id, $textbotlang['Admin']['managepanel']['getloc'], $json_list_marzban_panel, 'HTML');
     $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
@@ -3895,6 +3996,50 @@ elseif($user['step'] == "GetPriceExtra"){
     $stmt->bind_param("s", $text);
     $stmt->execute();
     sendmessage($from_id, $textbotlang['users']['Extra_volume']['ChangedPrice'], $shopkeyboard, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'home';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+if($text == "🤖 افزودن نماینده"){
+    sendmessage($from_id, $textbotlang['Admin']['agent']['agentsendid'], $backadmin, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'getidagent';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+elseif($user['step'] == "getidagent"){
+    if (!in_array($text, $users_ids)) {
+        sendmessage($from_id, $textbotlang['Admin']['not-user'], $backadmin, 'HTML');
+        return;
+    }
+    sendmessage($from_id, $textbotlang['Admin']['agent']['useragented'], $User_Services, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET agent = ? WHERE id = ?");
+    $value = "n";
+    $stmt->bind_param("si", $value, $text);
+    $stmt->execute();
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'home';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+if($text == "🤖 حذف نماینده"){
+    sendmessage($from_id, $textbotlang['Admin']['agent']['agentsendidremove'], $backadmin, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
+    $step = 'getidagentf';
+    $stmt->bind_param("ss", $step, $from_id);
+    $stmt->execute();
+}
+elseif($user['step'] == "getidagentf"){
+    if (!in_array($text, $users_ids)) {
+        sendmessage($from_id, $textbotlang['Admin']['not-user'], $backadmin, 'HTML');
+        return;
+    }
+    sendmessage($from_id, $textbotlang['Admin']['agent']['useragentremoved'], $User_Services, 'HTML');
+    $stmt = $connect->prepare("UPDATE user SET agent = ? WHERE id = ?");
+    $value = "f";
+    $stmt->bind_param("si", $value, $text);
+    $stmt->execute();
     $stmt = $connect->prepare("UPDATE user SET step = ? WHERE id = ?");
     $step = 'home';
     $stmt->bind_param("ss", $step, $from_id);

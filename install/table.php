@@ -24,13 +24,20 @@ try {
         Balance int(255) NOT null ,
         User_Status varchar(500) NOT NULL,
         spam varchar(500) NOT NULL,
-        pagenumber int(10) NOT NULL)
+        pagenumber int(10) NOT NULL,
+        agent varchar(100) NOT NULL)
         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin");
         if (!$result) {
             echo "table User".mysqli_error($connect);
         }
     }
     else {
+        $Check_filde = $connect->query("SHOW COLUMNS FROM user LIKE 'agent'");
+        if (mysqli_num_rows($Check_filde) != 1) {
+            $connect->query("ALTER TABLE user ADD agent VARCHAR(100)");
+            $connect->query("UPDATE user SET agent = 'f'");
+            echo "The agent field was added ✅";
+        }
         $Check_filde = $connect->query("SHOW COLUMNS FROM user LIKE 'Processing_value'");
         if (mysqli_num_rows($Check_filde) != 1) {
             $connect->query("ALTER TABLE user ADD Processing_value VARCHAR(1000)");
@@ -359,7 +366,8 @@ try {
         price_product varchar(2000) NULL,
         Volume_constraint varchar(2000) NULL,
         Location varchar(1000) NULL,
-        Service_time varchar(200) NULL)
+        Service_time varchar(200) NULL,
+        agent varchar(100) NULL)
         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin");
         if (!$result) {
             echo "table product".mysqli_error($connect);
@@ -370,6 +378,12 @@ try {
         if (mysqli_num_rows($Check_filde) != 1) {
            $result = $connect->query("ALTER TABLE product ADD Location VARCHAR(1000)");
         } 
+        $Check_filde = $connect->query("SHOW COLUMNS FROM product LIKE 'agent'");
+        if (mysqli_num_rows($Check_filde) != 1) {
+            $connect->query("ALTER TABLE product ADD agent VARCHAR(100)");
+            $connect->query("UPDATE product SET agent = 'f'");
+            echo "The agent field was added ✅";
+        }
         $Check_filde = $connect->query("SHOW COLUMNS FROM product LIKE 'code_product'");
         if (mysqli_num_rows($Check_filde) != 1) {
            $result = $connect->query("ALTER TABLE product ADD code_product VARCHAR(200)");
@@ -394,7 +408,8 @@ try {
         name_product varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL,
         price_product varchar(2000) NULL,
         Volume varchar(2000) NULL,
-        Service_time varchar(200) NULL)
+        Service_time varchar(200) NULL,
+        Status varchar(200) NULL)
         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin");
         if (!$result) {
             echo "table invoice".mysqli_error($connect);
@@ -404,6 +419,10 @@ try {
      $Check_filde = $connect->query("SHOW COLUMNS FROM invoice LIKE 'time_sell'");
         if (mysqli_num_rows($Check_filde) != 1) {
            $result = $connect->query("ALTER TABLE invoice ADD time_sell VARCHAR(2000)");
+        }    
+        $Check_filde = $connect->query("SHOW COLUMNS FROM invoice LIKE 'Status'");
+        if (mysqli_num_rows($Check_filde) != 1) {
+           $result = $connect->query("ALTER TABLE invoice ADD Status VARCHAR(2000)");
         }    
     }
 } catch (Exception $e) {
@@ -640,6 +659,8 @@ try {
         $connect->query("INSERT INTO PaySetting (NamePay,ValuePay) VALUES ('digistatus','offdigi') ");
         $connect->query("INSERT INTO PaySetting (NamePay,ValuePay) VALUES ('merchant_id','0') ");
         $connect->query("INSERT INTO PaySetting (NamePay,ValuePay) VALUES ('statuszarinpal','offzarinpal') ");
+        $connect->query("INSERT INTO PaySetting (NamePay,ValuePay) VALUES ('statusaqayepardakht','offaqayepardakht') ");
+        $connect->query("INSERT INTO PaySetting (NamePay,ValuePay) VALUES ('merchant_id_aqayepardakht','0')");
     }
     else{
         $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('Cartstatus','oncard') ");
@@ -649,6 +670,8 @@ try {
         $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('digistatus','offdigi')");
         $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('merchant_id','0')");
         $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('statuszarinpal','offzarinpal')");
+        $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('statusaqayepardakht','offaqayepardakht') ");
+        $connect->query("INSERT IGNORE INTO PaySetting (NamePay,ValuePay) VALUES ('merchant_id_aqayepardakht','0')");
 
 
     }
