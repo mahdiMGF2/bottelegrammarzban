@@ -3,7 +3,6 @@ $token = $_POST['tokenbot'];
 $idadmin = $_POST['idadmin'];
 $dbname = $_POST['dbname'];
 $dbuser = $_POST['dbuser'];
-$nowpaymentkey = $_POST['nowpaymentkey'];
 $idbot = $_POST['idbot'];
 $passworddb = $_POST['dbpassword'];
 $domain = $_SERVER['HTTP_HOST'];
