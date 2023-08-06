@@ -1,3 +1,9 @@
+<h1 align="center"/>The free development of this project has been stopped for some reason and no other free update will be released
+You can contact us to buy the advanced version</h1>
+
+
+
+
 <h1 align="center"/>Bot Mirza Panel</h1>
 
 <p align="center">Bot for VPN Sale with Auto Build</p>
