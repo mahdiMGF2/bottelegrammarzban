@@ -12,6 +12,8 @@ echo -e "\e[32m mirzapanel by mahdi \033[0m\n"
 
 sudo apt update && apt upgrade -y
 echo -e "\e[92mThe server was successfully updated ...\033[0m\n"
+sudo apt install php8.2 php8.2-fpm php8.2-mysql
+
 
 
 PKG=(
