@@ -69,7 +69,7 @@ sudo apt-get install -y php-ssh2
 sudo apt-get install -y libssh2-1-dev libssh2-1
 sudo systemctl restart apache2.service
 wait
-git clone https://github.com/mahdigholipour3/bottelegrammarzban.git /var/www/html/bottelegrammarzban
+git clone https://github.com/mahdiMGF2/botmirzapanel.git /var/www/html/bottelegrammarzban
 sudo chown -R www-data:www-data /var/www/html/bottelegrammarzban/
 sudo chmod -R 755 /var/www/html/bottelegrammarzban/
 echo -e "\n\033[33mmirza config and script have been installed successfully\033[0m"
